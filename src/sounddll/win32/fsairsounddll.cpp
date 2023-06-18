@@ -310,6 +310,7 @@ __declspec(dllexport) void FsSoundDllInitialize(HWND hWndMain)
 	alarmWav[(int)FSSND_ALARM_STALL].Load("sound/stallhorn.wav");
 	alarmWav[(int)FSSND_ALARM_MISSILE].Load("sound/warning.wav");
 	alarmWav[(int)FSSND_ALARM_TERRAIN].Load("sound/gearhorn.wav");
+	alarmWav[(int)FSSND_ALARM_OVERG].Load("sound/overg.wav");
 
 	oneTimeWav[(int)FSSND_ONETIME_DAMAGE].Load("sound/damage.wav");
 	oneTimeWav[(int)FSSND_ONETIME_MISSILE].Load("sound/missile.wav");

@@ -110,6 +110,7 @@ extern "C" void FsSoundDllInitialize(void)
 	alarmWav[(int)FSSND_ALARM_STALL].LoadWav("sound/stallhorn.wav");
 	alarmWav[(int)FSSND_ALARM_MISSILE].LoadWav("sound/warning.wav");
 	alarmWav[(int)FSSND_ALARM_TERRAIN].LoadWav("sound/gearhorn.wav");
+	alarmWav[(int)FSSND_ALARM_OVERG].Load("sound/overg.wav");
 
 	oneTimeWav[(int)FSSND_ONETIME_DAMAGE].LoadWav("sound/damage.wav");
 	oneTimeWav[(int)FSSND_ONETIME_MISSILE].LoadWav("sound/missile.wav");

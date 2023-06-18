@@ -8898,6 +8898,9 @@ void FsSimulation::SimBlastSound(YSBOOL demoMode)
 		{
 			FsSoundSetAlarm(FSSND_ALARM_STALL);
 		}
+		else if(YSTRUE!=demoMode && playerPlane->Prop().GetG()>5 || playerPlane->Prop().GetG()<-3){
+			FsSoundSetAlarm(FSSND_ALARM_OVERG);
+		}
 		else if(YSTRUE!=demoMode &&
 		        playerPlane->Prop().HasGearHorn()==YSTRUE &&
 		        playerPlane->Prop().GetAGL()<152.4 &&        // Less than 500ft
