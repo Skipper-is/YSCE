@@ -29,8 +29,8 @@ void (*FsSoundDllStopAll)(void)=NULL;
 void (*FsSoundDllSetVehicleName)(const char vehicleName[])=NULL;
 void (*FsSoundDllSetEngine)(FSSND_ENGINETYPE engineType,int numEngine,const double power)=NULL;
 void (*FsSoundDllSetMachineGun)(FSSND_MACHINEGUNTYPE machineGunType)=NULL;
-void (*FsSoundDllSetAlarm)(FSSND_ALARMTYPE alarmType)=NULL;
-void (*FsSoundDllSetOneTime)(FSSND_ONETIMETYPE oneTimeType)=NULL;
+void (*FsSoundDllSetAlarm)(FSSND_ALARMTYPE alarmType, int balance, int volume)=NULL;
+void (*FsSoundDllSetOneTime)(FSSND_ONETIMETYPE oneTimeType, int balance, int volume)=NULL;
 void (*FsSoundDllKeepPlaying)(void)=NULL;
 }
 
@@ -78,8 +78,8 @@ void FsSoundInitialize(void)
 			FsSoundDllSetEngine=(void (*)(FSSND_ENGINETYPE,int,const double))dlsym(FsSndDllPtr,"FsSoundDllSetEngine");
 
 			FsSoundDllSetMachineGun=(void (*)(FSSND_MACHINEGUNTYPE machineGunType))dlsym(FsSndDllPtr,"FsSoundDllSetMachineGun");
-			FsSoundDllSetAlarm=(void (*)(FSSND_ALARMTYPE alarmType))dlsym(FsSndDllPtr,"FsSoundDllSetAlarm");
-			FsSoundDllSetOneTime=(void (*)(FSSND_ONETIMETYPE oneTimeType))dlsym(FsSndDllPtr,"FsSoundDllSetOneTime");
+			FsSoundDllSetAlarm=(void (*)(FSSND_ALARMTYPE alarmType int, int))dlsym(FsSndDllPtr,"FsSoundDllSetAlarm");
+			FsSoundDllSetOneTime=(void (*)(FSSND_ONETIMETYPE oneTimeType, int, int))dlsym(FsSndDllPtr,"FsSoundDllSetOneTime");
 			FsSoundDllKeepPlaying=(void (*)(void))dlsym(FsSndDllPtr,"FsSoundDllKeepPlaying");
 
 			if(NULL!=FsSoundDllInitialize)
@@ -179,11 +179,11 @@ void FsSoundSetMachineGun(FSSND_MACHINEGUNTYPE machineGunType)
 	}
 }
 
-void FsSoundSetAlarm(FSSND_ALARMTYPE alarmType)
+void FsSoundSetAlarm(FSSND_ALARMTYPE alarmType, int balance = 0)
 {
 	if(NULL!=FsSoundDllSetAlarm)
 	{
-		(*FsSoundDllSetAlarm)(alarmType);
+		(*FsSoundDllSetAlarm)(alarmType, balance);
 	}
 }
 

@@ -9,7 +9,7 @@
 #include <mmsystem.h>
 
 
-#include "../fsairsound.h"
+#include "../../common/fsairsound.h"
 
 
 class FsSoundStatus
@@ -20,7 +20,7 @@ public:
 	FSSND_ENGINETYPE engineType;
 	int numEngine;
 	double enginePower;
-
+	int balance;
 	FSSND_MACHINEGUNTYPE machineGunType;
 	FSSND_ALARMTYPE alarmType;
 	FSSND_ONETIMETYPE oneTimeType;
@@ -42,7 +42,7 @@ void FsSoundStatus::Initialize(void)
 	engineType=FSSND_ENGINE_SILENT;
 	numEngine=0;
 	enginePower=0.0;
-
+	balance=0;
 	machineGunType=FSSND_MACHINEGUN_SILENT;
 	alarmType=FSSND_ALARM_SILENT;
 	oneTimeType=FSSND_ONETIME_SILENT;
@@ -196,8 +196,8 @@ YSRESULT FsWaveSound::Play(int loop,int volume)
 
 			if(waveOutPrepareHeader(handle,&header,sizeof(header))==MMSYSERR_NOERROR)
 			{
-				volume=volume*0x10000+volume;
-/*
+				volume = 0xFFFF0000;
+
 #if(WINVER>=0x0400)  //VC++4.0
 				waveOutSetVolume(handle,volume);
 #else                //VC++2.0
@@ -205,7 +205,7 @@ YSRESULT FsWaveSound::Play(int loop,int volume)
 				waveOutGetID(handle,&id);
 				waveOutSetVolume(id,volume);
 #endif
-*/
+
 
 				waveOutWrite(handle,&header,sizeof(header));
 				isPlaying=YSTRUE;
@@ -491,7 +491,7 @@ __declspec(dllexport) void FsSoundDllKeepPlaying(void)
 
 				if(isPlaying!=wavToPlay)
 				{
-					FsPlayWaveSound(wavToPlay,10000,32768);
+					// FsPlayWaveSound(wavToPlay,10000,32768);
 				}
 			}
 		}

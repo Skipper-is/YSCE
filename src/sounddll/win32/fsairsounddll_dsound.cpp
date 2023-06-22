@@ -20,6 +20,8 @@ public:
 
 	FSSND_ENGINETYPE engineType;
 	int numEngine;
+	int balance;
+	int volume;
 	double enginePower;
 
 	FSSND_MACHINEGUNTYPE machineGunType;
@@ -42,6 +44,8 @@ void FsSoundStatus::Initialize(void)
 
 	engineType=FSSND_ENGINE_SILENT;
 	numEngine=0;
+	balance=0;
+	volume = 1;
 	enginePower=0.0;
 
 	machineGunType=FSSND_MACHINEGUN_SILENT;
@@ -153,7 +157,7 @@ LPDIRECTSOUNDBUFFER CreateWAVSoundBuffer(LPDIRECTSOUND8 itfc,const char fn[])
 		LPDIRECTSOUNDBUFFER directSoundBuffer;
 		DSBUFFERDESC desc;
 		desc.dwSize=sizeof(desc);
-		desc.dwFlags=DSBCAPS_CTRLVOLUME|DSBCAPS_LOCDEFER;
+		desc.dwFlags=DSBCAPS_CTRLVOLUME|DSBCAPS_LOCDEFER|DSBCAPS_CTRLPAN|DSBCAPS_CTRLFREQUENCY;
 		desc.dwBufferBytes=wav.nDat;
 		desc.dwReserved=0;
 		desc.lpwfxFormat=&wav.fmt;
@@ -273,6 +277,7 @@ __declspec(dllexport) void FsSoundDllInitialize(HWND hWndMain)
 		alarmWav[(int)FSSND_ALARM_STALL]=CreateWAVSoundBuffer(dSound8,"sound/stallhorn.wav");
 		alarmWav[(int)FSSND_ALARM_MISSILE]=CreateWAVSoundBuffer(dSound8,"sound/warning.wav");
 		alarmWav[(int)FSSND_ALARM_TERRAIN]=CreateWAVSoundBuffer(dSound8,"sound/gearhorn.wav");
+		alarmWav[(int)FSSND_ALARM_OVERG]=CreateWAVSoundBuffer(dSound8,"sound/overg.wav");
 
 		oneTimeWav[(int)FSSND_ONETIME_DAMAGE]=CreateWAVSoundBuffer(dSound8,"sound/damage.wav");
 		oneTimeWav[(int)FSSND_ONETIME_MISSILE]=CreateWAVSoundBuffer(dSound8,"sound/missile.wav");
@@ -422,17 +427,28 @@ __declspec(dllexport) void FsSoundDllSetMachineGun(FSSND_MACHINEGUNTYPE machineG
 	sndStatus.machineGunType=machineGunType;
 }
 
-__declspec(dllexport) void FsSoundDllSetAlarm(FSSND_ALARMTYPE alarmType)
+__declspec(dllexport) void FsSoundDllSetAlarm(FSSND_ALARMTYPE alarmType, int balance = 0, int volume = 100)
 {
 	sndStatus.alarmType=alarmType;
+
+	sndStatus.balance = balance;
+	sndStatus.volume = volume;
 }
 
-__declspec(dllexport) void FsSoundDllSetOneTime(FSSND_ONETIMETYPE oneTimeType)
+__declspec(dllexport) void FsSoundDllSetOneTime(FSSND_ONETIMETYPE oneTimeType, int balance = 0, int volume = 100)
 {
 	if(YSTRUE==fsSoundMasterSwitch && YSTRUE==fsSoundOneTimeSwitch)
 	{
 		if(NULL!=oneTimeWav[(int)oneTimeType])
 		{
+			sndStatus.balance = balance;
+			int max = DSBVOLUME_MAX;
+			int min = DSBVOLUME_MIN;
+
+			sndStatus.volume = (volume * (max - min) / 100) + min;
+
+			oneTimeWav[(int)oneTimeType]->SetPan((LONG)sndStatus.balance*10);
+			oneTimeWav[(int)oneTimeType]->SetVolume((LONG)sndStatus.volume);
 			oneTimeWav[(int)oneTimeType]->Play(0,0xc0000000,0);
 			sndStatus.oneTimeType=oneTimeType;
 		}
@@ -444,6 +460,7 @@ __declspec(dllexport) void FsSoundDllKeepPlaying(void)
 	if(YSTRUE==fsSoundMasterSwitch && YSTRUE==fsSoundEnvironmentalSwitch)
 	{
 		int i;
+		int volume;
 		DWORD sta;
 
 		for(i=0; i<FSSND_NUM_MACHINEGUNTYPE; i++)
@@ -467,9 +484,21 @@ __declspec(dllexport) void FsSoundDllKeepPlaying(void)
 			if(NULL!=alarmWav[i])
 			{
 				alarmWav[i]->GetStatus(&sta);
+				int max = DSBVOLUME_MAX;
+				int min = DSBVOLUME_MIN;
+
+				volume = (sndStatus.volume * (max - min) / 100) + min;
 				if(0==(sta&DSBSTATUS_PLAYING) && sndStatus.alarmType==i)
 				{
+					alarmWav[i]->SetPan((LONG)sndStatus.balance*10);
+					alarmWav[i]->SetVolume((LONG)volume);
+
 					alarmWav[i]->Play(0,0xa0000000,DSBPLAY_LOOPING);
+				}
+				else if (0!=(sta&DSBSTATUS_PLAYING) && sndStatus.alarmType==i) // If the alarm is playing, update the balance
+				{
+					alarmWav[i]->SetPan((LONG)sndStatus.balance*10);
+					alarmWav[i]->SetVolume((LONG)volume);
 				}
 				else if(0!=(sta&DSBSTATUS_PLAYING) && sndStatus.alarmType!=i)
 				{
@@ -515,7 +544,7 @@ __declspec(dllexport) void FsSoundDllKeepPlaying(void)
 			{
 				wavToPlay->GetStatus(&sta);
 				if(0==(sta&DSBSTATUS_PLAYING))
-				{
+				{	
 					wavToPlay->Play(0,0x80000000,DSBPLAY_LOOPING);
 				}
 			}

@@ -16,8 +16,8 @@ void FsSoundStopAll(void);
 void FsSoundSetVehicleName(const char vehicleName[]);
 void FsSoundSetEngine(FSSND_ENGINETYPE engineType,int numEngine,const double power);
 void FsSoundSetMachineGun(FSSND_MACHINEGUNTYPE machineGunType);
-void FsSoundSetAlarm(FSSND_ALARMTYPE alarmType);
-void FsSoundSetOneTime(FSSND_ONETIMETYPE oneTimeType);
+void FsSoundSetAlarm(FSSND_ALARMTYPE alarmType, int balance=0, int volume=100);
+void FsSoundSetOneTime(FSSND_ONETIMETYPE oneTimeType, int balance = 0, int volume = 100);
 void FsSoundKeepPlaying(void);
 
 void FsVoiceStopAll(void);

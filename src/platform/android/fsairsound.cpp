@@ -51,7 +51,7 @@ void FsSoundSetMachineGun(FSSND_MACHINEGUNTYPE )
 {
 }
 
-void FsSoundSetAlarm(FSSND_ALARMTYPE )
+void FsSoundSetAlarm(FSSND_ALARMTYPE, int balance = 0)
 {
 }
 

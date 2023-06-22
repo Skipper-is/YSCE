@@ -8887,8 +8887,32 @@ void FsSimulation::SimBlastSound(YSBOOL demoMode)
 		}
 
 		if(bulletHolder.IsLockedOn(playerPlane)==YSTRUE)
-		{
-			FsSoundSetAlarm(FSSND_ALARM_MISSILE);
+		{	
+			
+			FSWEAPONTYPE chasingWeaponType;
+			YsVec3 chasingWeaponPos;
+			if(IsMissileChasing(chasingWeaponType,chasingWeaponPos, playerPlane)){
+				if(chasingWeaponType == FSWEAPON_AIM120 || chasingWeaponType == FSWEAPON_AIM9 || chasingWeaponType == FSWEAPON_AIM9X){
+					int x = chasingWeaponPos.x();
+					int z = chasingWeaponPos.z();
+
+					int selfx = playerPlane->Prop().GetPosition().x();
+					int selfz = playerPlane->Prop().GetPosition().z();
+					int angle = (atan2(z-selfz, x-selfx) * 180 / YsPi)+180;
+					YsAtt3 attitude = playerPlane->Prop().GetAttitude();
+					int selfAngle = attitude.h(); //In radians
+					selfAngle = selfAngle * 180 / YsPi;
+					int diff = angle - selfAngle;
+					int sinDiff = sin(diff * YsPi / 180)*100;
+					printf("Angle from missile: %d\n", sinDiff);
+					FsSoundSetAlarm(FSSND_ALARM_MISSILE, sinDiff,100);
+
+					
+					
+				}
+			}
+			
+			
 		}
 		else if(YSTRUE!=demoMode &&
 		        YSTRUE!=isInVTOLMode &&
@@ -8899,7 +8923,19 @@ void FsSimulation::SimBlastSound(YSBOOL demoMode)
 			FsSoundSetAlarm(FSSND_ALARM_STALL);
 		}
 		else if(YSTRUE!=demoMode && playerPlane->Prop().GetG()>5 || playerPlane->Prop().GetG()<-3){
-			FsSoundSetAlarm(FSSND_ALARM_OVERG);
+			double g = playerPlane->Prop().GetG();
+			double scale = 1;
+			if (g>5){
+				scale = (g-3)/3;
+			}
+			else if (g<-3){
+				scale = -(g+1)/3;
+			}
+			if (scale > 1){
+				scale = 1;
+			}
+			printf("G: %f\n", scale);
+			FsSoundSetAlarm(FSSND_ALARM_OVERG, 0,scale*100);
 		}
 		else if(YSTRUE!=demoMode &&
 		        playerPlane->Prop().HasGearHorn()==YSTRUE &&
@@ -8956,7 +8992,7 @@ void FsSimulation::SimBlastSound(YSBOOL demoMode)
 	{
 		FsSoundSetEngine(FSSND_ENGINE_SILENT,0,0.0);
 		FsSoundSetMachineGun(FSSND_MACHINEGUN_SILENT);
-		FsSoundSetAlarm(FSSND_ALARM_SILENT);
+		FsSoundSetAlarm(FSSND_ALARM_SILENT,0);
 	}
 
 	FsSoundKeepPlaying();

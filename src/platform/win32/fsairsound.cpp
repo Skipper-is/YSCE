@@ -26,8 +26,8 @@ void (__cdecl *FsSoundDllStopAll)(void)=NULL;
 void (__cdecl *FsSoundDllSetVehicleName)(const char vehicleName[])=NULL;
 void (__cdecl *FsSoundDllSetEngine)(FSSND_ENGINETYPE engineType,int numEngine,const double power)=NULL;
 void (__cdecl *FsSoundDllSetMachineGun)(FSSND_MACHINEGUNTYPE machineGunType)=NULL;
-void (__cdecl *FsSoundDllSetAlarm)(FSSND_ALARMTYPE alarmType)=NULL;
-void (__cdecl *FsSoundDllSetOneTime)(FSSND_ONETIMETYPE oneTimeType)=NULL;
+void (__cdecl *FsSoundDllSetAlarm)(FSSND_ALARMTYPE alarmType,int balance, int volume)=NULL;
+void (__cdecl *FsSoundDllSetOneTime)(FSSND_ONETIMETYPE oneTimeType,int balance,int volume)=NULL;
 void (__cdecl *FsSoundDllKeepPlaying)(void)=NULL;
 
 static HMODULE hSndDll=NULL;
@@ -74,8 +74,8 @@ void FsSoundInitialize(void)
 			FsSoundDllSetEngine=(void (__cdecl *)(FSSND_ENGINETYPE,int,const double))GetProcAddress(hSndDll,"FsSoundDllSetEngine");
 
 			FsSoundDllSetMachineGun=(void (__cdecl *)(FSSND_MACHINEGUNTYPE machineGunType))GetProcAddress(hSndDll,"FsSoundDllSetMachineGun");
-			FsSoundDllSetAlarm=(void (__cdecl *)(FSSND_ALARMTYPE alarmType))GetProcAddress(hSndDll,"FsSoundDllSetAlarm");
-			FsSoundDllSetOneTime=(void (__cdecl *)(FSSND_ONETIMETYPE oneTimeType))GetProcAddress(hSndDll,"FsSoundDllSetOneTime");
+			FsSoundDllSetAlarm=(void (__cdecl *)(FSSND_ALARMTYPE alarmType,int balance, int volume))GetProcAddress(hSndDll,"FsSoundDllSetAlarm");
+			FsSoundDllSetOneTime=(void (__cdecl *)(FSSND_ONETIMETYPE oneTimeType,int balance,int volume))GetProcAddress(hSndDll,"FsSoundDllSetOneTime");
 			FsSoundDllKeepPlaying=(void (__cdecl *)(void))GetProcAddress(hSndDll,"FsSoundDllKeepPlaying");
 
 			if(NULL!=FsSoundDllInitialize)
@@ -191,19 +191,19 @@ void FsSoundSetMachineGun(FSSND_MACHINEGUNTYPE machineGunType)
 	}
 }
 
-void FsSoundSetAlarm(FSSND_ALARMTYPE alarmType)
+void FsSoundSetAlarm(FSSND_ALARMTYPE alarmType, int balance, int volume)
 {
 	if(NULL!=FsSoundDllSetAlarm)
 	{
-		(*FsSoundDllSetAlarm)(alarmType);
+		(*FsSoundDllSetAlarm)(alarmType,balance,volume);
 	}
 }
 
-void FsSoundSetOneTime(FSSND_ONETIMETYPE oneTimeType)
+void FsSoundSetOneTime(FSSND_ONETIMETYPE oneTimeType, int balance, int volume)
 {
 	if(NULL!=FsSoundDllSetOneTime)
 	{
-		(*FsSoundDllSetOneTime)(oneTimeType);
+		(*FsSoundDllSetOneTime)(oneTimeType, balance, volume);
 	}
 }
 

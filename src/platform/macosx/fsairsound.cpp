@@ -179,11 +179,11 @@ void FsSoundSetMachineGun(FSSND_MACHINEGUNTYPE machineGunType)
 	}
 }
 
-void FsSoundSetAlarm(FSSND_ALARMTYPE alarmType)
+void FsSoundSetAlarm(FSSND_ALARMTYPE alarmType, int balance =0)
 {
 	if(NULL!=FsSoundDllSetAlarm)
 	{
-		(*FsSoundDllSetAlarm)(alarmType);
+		(*FsSoundDllSetAlarm)(alarmType, balance);
 	}
 }
 

@@ -51,11 +51,11 @@ void FsSoundSetMachineGun(FSSND_MACHINEGUNTYPE )
 {
 }
 
-void FsSoundSetAlarm(FSSND_ALARMTYPE )
+void FsSoundSetAlarm(FSSND_ALARMTYPE, int balance, int volume)
 {
 }
 
-void FsSoundSetOneTime(FSSND_ONETIMETYPE )
+void FsSoundSetOneTime(FSSND_ONETIMETYPE, int balance, int volume)
 {
 }
 
