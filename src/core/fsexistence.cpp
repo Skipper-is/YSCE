@@ -1119,6 +1119,190 @@ void FsAirplane::AddSingleSmokeVertexArray(
 	}
 }
 
+void FsAirplane::MakeContrailVertexArray(class YsGLVertexBuffer &vtxBuf,class YsGLNormalBuffer &nomBuf,class YsGLColorBuffer &colBuf,double currentTime,double remainTime,FSSMOKETYPE smk,int d) const
+{
+	vtxBuf.CleanUp();
+	nomBuf.CleanUp();
+	colBuf.CleanUp();
+	for(YSSIZE_T i=0; i<Prop().GetNumSmokeGenerator(); i++)
+	{
+		AddSingleContrailVertexArray(vtxBuf,nomBuf,colBuf,i,currentTime,remainTime,smk,d);
+	}
+}
+
+void FsAirplane::AddSingleContrailVertexArray(
+    class YsGLVertexBuffer &vtxBuf,class YsGLNormalBuffer &nomBuf,class YsGLColorBuffer &colBuf,
+    int smkId,double currentTime,double remainTime,FSSMOKETYPE smk,int step) const
+{
+	if(smk==FSSMKNULL)
+	{
+		return;
+	}
+
+	if(rec!=NULL)
+	{
+		YSSIZE_T idx=0;
+
+		const YsColor smkCol=YsWhite();
+
+		// Catch the index
+		double t0=YsGreater(currentTime-remainTime,0.0);
+		double t=currentTime;
+		while(t>t0)
+		{
+			if(rec->GetIndexByTime(idx,t)==YSOK)
+			{
+				break;
+			}
+			t-=0.05;
+		}
+
+		idx++; // Trick
+
+		// Draw smoke
+		FsFlightRecord *r0,*r1;
+		FsFlightRecord fakeRecord;
+		YsVec3 smkp0,smkp1,smkgen;
+		YsAtt3 smka0,smka1;
+		double tm0,tm1;
+		int d,smallStepRemain;
+		YSBOOL drewPrevious;
+
+		r0=rec->GetLastElement(tm0);
+		if(r0!=NULL && t0<tm0)  // Smoke may exist between time t0 and t1
+		{
+			r0=NULL;
+			r1=NULL;
+			tm0=0.0;
+			tm1=0.0;
+			smkp0.Set(0.0,0.0,0.0);
+			smkp1.Set(0.0,0.0,0.0);
+			smka0.Set(0.0,0.0,0.0);
+			smka1.Set(0.0,0.0,0.0);
+			prop.GetSmokeGeneratorPosition(smkgen,smkId);
+
+			d=1;
+			smallStepRemain=step*2;
+			drewPrevious=YSFALSE;
+
+			while(t>t0 && idx>0)
+			{
+				r1=r0;
+				tm1=tm0;
+
+				r0=rec->GetElement(tm0,idx);
+
+				if(isPlayingRecord!=YSTRUE &&
+				   prop.IsTrailingContrail()==YSTRUE &&
+				   r1==NULL && r0!=NULL)
+				{
+					printf("Trailing Contrail\n");
+					const YsVec3 *pos;
+					const YsAtt3 *att;
+					pos=&GetPosition();
+					att=&GetAttitude();
+					fakeRecord.smoke=1;
+					fakeRecord.pos=*pos;
+					fakeRecord.h=float(att->h());
+					fakeRecord.p=float(att->p());
+					fakeRecord.b=float(att->b());
+					fakeRecord.smoke|=(1<<smkId);
+					r1=&fakeRecord;
+					tm1=currentTime;
+				}
+
+				if(r0!=NULL && r1!=NULL && ((r0->smoke&(1<<smkId))!=0 || (r1->smoke&(1<<smkId))!=0))
+				{
+					if(drewPrevious==YSTRUE)
+					{
+						smkp1=smkp0;
+						smka1=smka0;
+					}
+					else
+					{
+						smka1.Set(r1->h,r1->p,r1->b);
+						smka1.Mul(smkp1,smkgen);  //smkp1=smka1.GetMatrix()*smkgen;
+						smkp1=smkp1+r1->pos; // (smkp1.x()+r1->x,smkp1.y()+r1->y,smkp1.z()+r1->z);
+					}
+
+					smka0.Set(r0->h,r0->p,r0->b);
+					smka0.Mul(smkp0,smkgen); //smkp0=smka0.GetMatrix()*smkgen;
+					smkp0=smkp0+r0->pos; // (smkp0.x()+r0->x,smkp0.y()+r0->y,smkp0.z()+r0->z);
+
+					if(tm0<=currentTime && currentTime<tm1)
+					{
+						smkp1=smkp0+(smkp1-smkp0)*(currentTime-tm0)/(tm1-tm0);
+					}
+
+					double ra0,ra1,alpha0,alpha1;
+					if(tm0<currentTime)
+					{
+						ra0=YsBound(sqrt(currentTime-tm0)*5.0,0.0,5.0);
+					}
+					else
+					{
+						ra0=0.0;
+					}
+					if(tm1<currentTime)
+					{
+						ra1=YsBound(sqrt(currentTime-tm1)*5.0,0.0,5.0);
+					}
+					else
+					{
+						ra1=0.0;
+					}
+					alpha0=0.8-0.8*(currentTime-tm0)/remainTime;
+					alpha1=0.8-0.8*(currentTime-tm1)/remainTime;
+					switch(smk)
+					{
+					default:
+						break;
+					case FSSMKNOODLE:
+					case FSSMKTOWEL:
+						AddTowelSmoke(vtxBuf,nomBuf,colBuf,smkId,smkp0,smka0,ra0,smkp1,smka1,ra1,alpha0,alpha1);
+						break;
+					case FSSMKSOLID:
+						if((r0->smoke&(1<<smkId))!=0 && (r1->smoke&(1<<smkId))!=0)
+						{
+							AddSolidSmoke(vtxBuf,nomBuf,colBuf,smkId,smkp0,smka0,ra0,smkp1,smka1,ra1,alpha0,alpha1);
+						}
+						else if((r0->smoke&(1<<smkId))!=0)
+						{
+							AddSolidSmokeLid(vtxBuf,nomBuf,colBuf,smkId,smkp0,smka0,ra0,alpha0);
+						}
+						else if((r1->smoke&(1<<smkId))!=0)
+						{
+							AddSolidSmokeLid(vtxBuf,nomBuf,colBuf,smkId,smkp1,smka1,ra1,alpha1);
+						}
+						break;
+					}
+					drewPrevious=YSTRUE;
+				}
+				else
+				{
+					drewPrevious=YSFALSE;
+				}
+				idx-=d;
+
+				if(r0!=NULL)
+				{
+					t=tm0;
+				}
+
+				if(d==1 && idx%step==0)
+				{
+					smallStepRemain--;
+					if(smallStepRemain<=0)
+					{
+						d=step;
+					}
+				}
+			}
+		}
+	}
+}
+
+
 void FsAirplane::AddSmokeRect(
     class YsGLVertexBuffer &vtxBuf,class YsGLNormalBuffer &nomBuf,class YsGLColorBuffer &colBuf,
     int smkIdx,
@@ -1538,6 +1722,13 @@ void FsAirplane::DrawSmoke(double currentTime,double remainTime,FSSMOKETYPE smk,
 	}
 }
 
+void FsAirplane::DrawContrail(double currentTime, double remainTime,FSSMOKETYPE smk, int d, YSBOOL transparency) const
+{
+	for (int i=0; i<Prop().GetNumSmokeGenerator(); i++)
+	{
+		DrawSingleContrail(i, currentTime, remainTime, smk, d, transparency);
+	}
+}
 YSRESULT FsAirplane::Record(const double &t,YSBOOL forceRecord)
 {
 	if(rec==NULL)

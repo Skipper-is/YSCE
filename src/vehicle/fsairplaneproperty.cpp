@@ -10069,6 +10069,18 @@ YSBOOL FsAirplaneProperty::IsTrailingSmoke(int smkIdx) const
 	return YSFALSE;
 }
 
+YSBOOL FsAirplaneProperty::IsTrailingContrail(void) const
+{	
+	double alt = GetTrueAltitude();
+	if (GetTrueAltitude()>6000)
+	{
+		printf("True");
+		return YSTRUE;
+	}
+	printf("False");
+	return YSFALSE;
+}
+
 void FsAirplaneProperty::WriteFlightRecord(FsFlightRecord &rec) const
 {
 	rec.pos=staPosition;

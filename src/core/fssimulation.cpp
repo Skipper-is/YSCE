@@ -7251,6 +7251,7 @@ void FsSimulation::SimDrawAirplaneVaporSmoke(void) const
 		if(seeker->IsAlive()==YSTRUE)
 		{
 			seeker->DrawVapor(currentTime,0.5,4,cfgPtr->drawTransparentVapor);
+			seeker->DrawContrail(currentTime,60, cfgPtr->smkType,4,cfgPtr->drawTransparentContrail);
 		}
 		if(YSTRUE!=cfgPtr->useParticle)
 		{

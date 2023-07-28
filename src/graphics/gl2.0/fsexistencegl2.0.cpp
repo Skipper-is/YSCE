@@ -80,6 +80,27 @@ void FsAirplane::DrawSingleSmoke(int smkId,double currentTime,double remainTime,
 #endif
 }
 
+void FsAirplane::DrawSingleContrail(int smkId,double currentTime,double remainTime,FSSMOKETYPE smk,int step,YSBOOL /*transparency*/ ) const{
+	#ifdef YSOGLERRORCHECk
+	FsOpenGlShowError("FsAirplane::DrawContrail In");
+#endif
+
+	YsGLVertexBuffer vtxBuf;
+	YsGLNormalBuffer nomBuf;
+	YsGLColorBuffer colBuf;
+	AddSingleContrailVertexArray(vtxBuf,nomBuf,colBuf,smkId,currentTime,remainTime,smk,step);
+
+	auto renderer=YsGLSLSharedVariColorPerVtxShading3DRenderer();
+	glEnable(GL_CULL_FACE);  // Supposed to be always on
+
+	YsGLSLUse3DRenderer(renderer);
+	YsGLSLDrawPrimitiveVtxNomColfv(renderer,GL_TRIANGLES,vtxBuf.size(),vtxBuf.data(),nomBuf.data(),colBuf.data());
+	YsGLSLEndUse3DRenderer(renderer);
+
+#ifdef YSOGLERRORCHECk
+	FsOpenGlShowError("FsAirplane::DrawContrail Out");
+#endif
+}
 void FsField::DrawMapVisual
     (FSENVIRONMENT env,
      const YsVec3 &viewPos,const YsAtt3 &viewAtt,const YsMatrix4x4 &projMat,const double &elvMin,const double &elvMax,YSBOOL drawPset,

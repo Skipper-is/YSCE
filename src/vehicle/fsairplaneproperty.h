@@ -887,6 +887,7 @@ public:
 
 	YSBOOL IsTrailingVapor(void) const;
 	YSBOOL IsTrailingSmoke(int smkIdx) const;
+	YSBOOL IsTrailingContrail(void) const;
 
 	void WriteFlightRecord(class FsFlightRecord &rec) const;
 	void ReadbackFlightRecord

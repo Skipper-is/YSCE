@@ -52,6 +52,7 @@ public:
 	YSBOOL drawTransparency;
 	YSBOOL drawTransparentVapor;
 	YSBOOL drawTransparentSmoke;
+	YSBOOL drawTransparentContrail;
 	YSBOOL drawTransparentLater;
 	YSBOOL useOpenGlListForCloud;
 	YSBOOL useOpenGlListForExplosion;

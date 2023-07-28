@@ -39,6 +39,7 @@ void FsFlightConfig::SetDefault(void)
 	drawTransparency=YSTRUE;
 	drawTransparentVapor=YSTRUE;
 	drawTransparentSmoke=YSTRUE;
+	drawTransparentContrail=YSTRUE;
 	drawTransparentLater=YSTRUE;
 
 	drawPlayerNameAlways=YSTRUE;
@@ -103,6 +104,7 @@ void FsFlightConfig::SetDetailedMode(void)
 	drawTransparency=YSTRUE;
 	drawTransparentSmoke=YSTRUE;
 	drawTransparentVapor=YSTRUE;
+	drawTransparentContrail=YSTRUE;
 	drawTransparentLater=YSTRUE;
 	drawFog=YSTRUE;
 	zbuffQuality=2;
@@ -126,6 +128,7 @@ void FsFlightConfig::SetFastMode(void)
 	drawTransparency=YSFALSE;
 	drawTransparentSmoke=YSFALSE;
 	drawTransparentVapor=YSFALSE;
+	drawTransparentContrail=YSFALSE;
 	drawTransparentLater=YSFALSE;
 	drawFog=YSFALSE;
 	zbuffQuality=0;

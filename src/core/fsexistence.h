@@ -286,8 +286,12 @@ public:
 
 	void MakeVaporVertexArray(class YsGLVertexBuffer &vtxBuf,class YsGLColorBuffer &colBuf,double currentTime,double remainTime,int step) const;
 	void MakeSmokeVertexArray(class YsGLVertexBuffer &vtxBuf,class YsGLNormalBuffer &nomBuf,class YsGLColorBuffer &colBuf,double currentTime,double remainTime,FSSMOKETYPE smk,int step) const;
+	void MakeContrailVertexArray(class YsGLVertexBuffer &vtxBuf,class YsGLNormalBuffer &nomBuf,class YsGLColorBuffer &colBuf,double currentTime,double remainTime,FSSMOKETYPE smk,int step) const;
 private:
 	void AddSingleSmokeVertexArray(
+	    class YsGLVertexBuffer &vtxBuf,class YsGLNormalBuffer &nomBuf,class YsGLColorBuffer &colBuf,
+	    int smkId,double currentTime,double remainTime,FSSMOKETYPE smk,int step) const;
+		void AddSingleContrailVertexArray(
 	    class YsGLVertexBuffer &vtxBuf,class YsGLNormalBuffer &nomBuf,class YsGLColorBuffer &colBuf,
 	    int smkId,double currentTime,double remainTime,FSSMOKETYPE smk,int step) const;
 	void AddSmokeRect(
@@ -326,7 +330,9 @@ public:
 	void AddSingleSmokeToParticleManager(class YsGLParticleManager &partMan,int smkId,double currentTime,double remainTime) const;
 
 	void DrawSmoke(double currentTime,double remainTime,FSSMOKETYPE smk,int d,YSBOOL transparency) const;
+	void DrawContrail(double currentTime,double remainTime,FSSMOKETYPE smk,int d,YSBOOL transparency) const;
 	void DrawSingleSmoke(int smkId,double currentTime,double remainTime,FSSMOKETYPE smk,int d,YSBOOL transparency) const;
+	void DrawSingleContrail(int smkId,double currentTime,double remainTime,FSSMOKETYPE smk,int d,YSBOOL transparency) const;
 	void DrawVapor(double currentTime,double remainTime,int d,YSBOOL transparency) const;
 	YSBOOL HitGround
 	  (FSDIEDOF &diedOf,
