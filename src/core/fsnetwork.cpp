@@ -1394,6 +1394,7 @@ YSRESULT FsSocketServer::BroadcastAirplaneState(void)
 
 YSRESULT FsSocketServer::StartEndurance(int clientId,unsigned char dat[],unsigned packetLength){
 	this->commandQueue.push(FSNCC_SVR_STARTENDURANCEMODE_JET);
+	this->commandQueue.push(FSNCC_SVR_TERMINATEMISSION);
 	return YSOK;
 }
 
