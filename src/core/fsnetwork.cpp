@@ -909,7 +909,8 @@ YSRESULT FsSocketServer::ReceivedFrom(int clientId,YSSIZE_T nBytes,unsigned char
 				case FSNETCMD_GNDCOLOR:              //  50
 				case FSNETCMD_RESERVED_FOR_LIGHTCOLOR:              //  51
 				case FSNETCMD_RESERVED21:
-					StartEndurance();              //  52
+					StartEndurance(clientId,cmdTop,packetLength);              //  52
+					break;
 				case FSNETCMD_RESERVED22:             //  53
 				case FSNETCMD_RESERVED23:             //  54
 				case FSNETCMD_RESERVED24:             //  55
@@ -1391,7 +1392,7 @@ YSRESULT FsSocketServer::BroadcastAirplaneState(void)
 	return YSOK;
 }
 
-YSRESULT FsSocketServer::StartEndurance(void){
+YSRESULT FsSocketServer::StartEndurance(int clientId,unsigned char dat[],unsigned packetLength){
 	this.commandQueue.push(FSNCC_SVR_STARTENDURANCEMODE_JET);
 	return YSOK;
 }
