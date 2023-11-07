@@ -385,8 +385,8 @@ public:
 
 	YSRESULT RectifyIllegalMissiles(void);
 
-	YSRESULT StartEndurance(void);
-	
+	YSRESULT StartEndurance(int clientId,unsigned char dat[],unsigned packetLength);
+
 
 	YSBOOL ReceivedKillServer(void);
 
