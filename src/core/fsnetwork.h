@@ -385,6 +385,9 @@ public:
 
 	YSRESULT RectifyIllegalMissiles(void);
 
+	YSRESULT StartEndurance(void);
+	
+
 	YSBOOL ReceivedKillServer(void);
 
 	int GetNumMessage(void) const;
