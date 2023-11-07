@@ -39,7 +39,7 @@ jobs:
       with:
         name: ys-build-windows
         path: ./ci_windows/main/Release
-        retention-days: 14
+        retention-days: 1
         
 
   build-linux:
@@ -81,11 +81,11 @@ jobs:
       with:
         name: ys-build-linux
         path: ./ci_ubuntu/main/
-        retention-days: 14
+        retention-days: 1
     - uses: actions/upload-artifact@v3
       with:
         name: ys-build-linux-nownd
         path: ./ci_ubuntu/main_consvr
-        retention-days: 14
+        retention-days: 1
       
 # MacOS was here, but Nodoka kicked it off a short pier.
