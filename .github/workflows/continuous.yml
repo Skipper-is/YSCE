@@ -43,49 +43,64 @@ jobs:
         
 
   build-linux:
+  runs-on: ubuntu-20.04
+  strategy:
+    matrix:
+      architecture: [i386]
 
-    runs-on: ubuntu-20.04
+  steps:
+  - uses: actions/checkout@v3
 
-    steps:
-    - uses: actions/checkout@v3
+  - name: Install vcpkg
+    uses: lukka/run-vcpkg@v11.1
+    with:
+      vcpkgArguments: --triplet x86-linux
+      vcpkgGitCommitId: 5b1214315250939257ef5d62ecdcbca18cf4fb1c
 
-    - name: Install vcpkg
-      uses: lukka/run-vcpkg@v11.1
-      with:
-        vcpkgArguments: --triplet x64-linux
-        vcpkgGitCommitId: 5b1214315250939257ef5d62ecdcbca18cf4fb1c
-    - name: Install dependencies
-      run: vcpkg install --triplet x64-linux
-      working-directory: src
-    - name: checkout_public
-      run: git clone https://github.com/YSCEDC/ysce_public.git
-    - name: mkdir
-      run: mkdir ci_ubuntu
-    - name: apt-get-update
-      run: sudo apt-get update
-    - name: install-OpenGL
-      run: sudo apt-get install libglu1-mesa-dev mesa-common-dev
-    - name: install-ALSA
-      run: sudo apt-get install libasound2 libasound2-dev
-    - name: install-PulseAudio
-      run: sudo apt-get install pulseaudio libpulse-dev
-    - name: install-Python
-      run: sudo apt-get install python3 python-is-python3
-    - name: cmake
-      run: cmake ../src -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/runner/work/YSCE/YSCE/vcpkg/installed/x64-linux -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/YSCE/YSCE/vcpkg/scripts/buildsystems/vcpkg.cmake
-      working-directory: ./ci_ubuntu
-    - name: build
-      run: cmake --build . --config Release --parallel --target ysflight64_gl1 ysflight64_gl2 ysflight64_gl1demo ysflight64_gl2demo ysflight64_nownd
-      working-directory: ./ci_ubuntu
-    - uses: actions/upload-artifact@v3
-      with:
-        name: ys-build-linux
-        path: ./ci_ubuntu/main/
-        retention-days: 1
-    - uses: actions/upload-artifact@v3
-      with:
-        name: ys-build-linux-nownd
-        path: ./ci_ubuntu/main_consvr
-        retention-days: 1
+  - name: Install dependencies
+    run: vcpkg install --triplet x86-linux
+    working-directory: src
+
+  - name: checkout_public
+    run: git clone https://github.com/YSCEDC/ysce_public.git
+
+  - name: mkdir
+    run: mkdir ci_ubuntu
+
+  - name: apt-get-update
+    run: sudo apt-get update
+
+  - name: install-OpenGL
+    run: sudo apt-get install libglu1-mesa-dev mesa-common-dev
+
+  - name: install-ALSA
+    run: sudo apt-get install libasound2 libasound2-dev
+
+  - name: install-PulseAudio
+    run: sudo apt-get install pulseaudio libpulse-dev
+
+  - name: install-Python
+    run: sudo apt-get install python3 python-is-python3
+
+  - name: cmake
+    run: cmake ../src -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/home/runner/work/YSCE/YSCE/vcpkg/installed/x86-linux -DCMAKE_TOOLCHAIN_FILE=/home/runner/work/YSCE/YSCE/vcpkg/scripts/buildsystems/vcpkg.cmake
+    working-directory: ./ci_ubuntu
+
+  - name: build
+    run: cmake --build . --config Release --parallel --target ysflight32_gl1 ysflight32_gl2 ysflight32_gl1demo ysflight32_gl2demo ysflight32_nownd
+    working-directory: ./ci_ubuntu
+
+  - uses: actions/upload-artifact@v3
+    with:
+      name: ys-build-linux
+      path: ./ci_ubuntu/main/
+      retention-days: 1
+
+  - uses: actions/upload-artifact@v3
+    with:
+      name: ys-build-linux-nownd
+      path: ./ci_ubuntu/main_consvr
+      retention-days: 1
+
       
 # MacOS was here, but Nodoka kicked it off a short pier.
