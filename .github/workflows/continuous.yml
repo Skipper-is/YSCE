@@ -25,7 +25,7 @@ jobs:
       run: vcpkg install --triplet x64-windows
       working-directory: src
     - name: checkout_public
-      run: git clone https://github.com/YSCEDC/ysce_public.git
+      run: git clone https://github.com/Skipper-is/ysce_public.git
     - name: mkdir
       run: mkdir ci_windows
     - name: cmake
@@ -62,7 +62,7 @@ jobs:
       working-directory: src
 
     - name: checkout_public
-      run: git clone https://github.com/YSCEDC/ysce_public.git
+      run: git clone https://github.com/Skipper-is/ysce_public.git
 
     - name: mkdir
       run: mkdir ci_ubuntu
