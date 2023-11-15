@@ -250,6 +250,7 @@ public:
 	double gLimit;   // <- For Radio Communication , Break and Attack
 	unsigned int airFlag;
 	double landWhenLowFuelThr;
+	YsVec3 chaseOffset;
 
 	FsRecord <FsFlightRecord> *rec;  // NOTE : Must not be allocated until used.
 	class FsInstrumentPanel *instPanel;   // <- instPanel is set in FsAirplane::SetProperty

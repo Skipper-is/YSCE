@@ -1871,7 +1871,7 @@ YSBOOL FsAirplane::LockOn(FsSimulation *sim,const double &radarAltLimit)
 		air=NULL;
 		while((air=sim->FindNextAirplane(air))!=NULL)
 		{
-			if(air->prop.IsAlive()==YSTRUE && air->iff!=this->iff)
+			if(air->prop.IsAlive()==YSTRUE && air->iff!=this->iff && air->iff!=FS_IFF0)
 			{
 				double altLimit;
 				altLimit=radarAltLimit+1000.0*(1.0-air->Prop().GetRadarCrossSection());
@@ -3223,7 +3223,7 @@ void FsGround::SearchTarget(FsSimulation *sim)
 					continue;
 				}
 
-				if(gnd->Prop().IsAlive()==YSTRUE && (gnd->iff!=this->iff || prop.TargetAny()==YSTRUE))
+				if(gnd->Prop().IsAlive()==YSTRUE && (gnd->iff!=this->iff ||prop.TargetAny()==YSTRUE) && gnd->iff!=FS_IFF0)
 				{
 					double tDist;
 					tDist=((gnd->GetPosition())-GetPosition()).GetSquareLength();
@@ -3257,7 +3257,7 @@ void FsGround::SearchTarget(FsSimulation *sim)
 			continue;
 		}
 
-		if(air->Prop().IsActive()==YSTRUE && (air->iff!=this->iff || prop.TargetAny()==YSTRUE))
+		if(air->Prop().IsActive()==YSTRUE && (air->iff!=this->iff || prop.TargetAny()==YSTRUE ) && air->iff!=FS_IFF0)
 		{
 			double tDist;
 			tDist=((air->GetPosition())-GetPosition()).GetSquareLength();
@@ -3321,7 +3321,7 @@ YSBOOL FsGround::LockOn(FsSimulation *sim,const double &radarAltLimit)
 		air=NULL;
 		while((air=sim->FindNextAirplane(air))!=NULL)
 		{
-			if(air->IsAlive()==YSTRUE && air->iff!=this->iff)
+			if(air->IsAlive()==YSTRUE && air->iff!=this->iff && air->iff!=FS_IFF0)
 			{
 				double altLimit;
 				altLimit=radarAltLimit+1000.0*(1.0-air->Prop().GetRadarCrossSection());
@@ -3367,7 +3367,7 @@ YSBOOL FsGround::LockOn(FsSimulation *sim,const double &radarAltLimit)
 		gnd=NULL;
 		while((gnd=sim->FindNextGround(gnd))!=NULL)
 		{
-			if(gnd->Prop().IsAlive()==YSTRUE && gnd->iff!=this->iff && gnd->Prop().IsNonGameObject()!=YSTRUE)
+			if(gnd->Prop().IsAlive()==YSTRUE && gnd->iff!=this->iff && gnd->Prop().IsNonGameObject()!=YSTRUE && gnd->iff!=FS_IFF0)
 			{
 				YsVec3 tpos;
 				gnd->Prop().GetPosition(tpos);

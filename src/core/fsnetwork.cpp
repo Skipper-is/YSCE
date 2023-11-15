@@ -885,6 +885,7 @@ YSRESULT FsSocketServer::ReceivedFrom(int clientId,YSSIZE_T nBytes,unsigned char
 					break;
 
 				case FSNETCMD_REVIVEGROUND:            //  35
+					BroadcastReviveGround();
 					break;
 				case FSNETCMD_WEAPONCONFIG:            //  36
 					ReceiveWeaponConfig(clientId,cmdTop,packetLength);
@@ -908,8 +909,11 @@ YSRESULT FsSocketServer::ReceivedFrom(int clientId,YSSIZE_T nBytes,unsigned char
 				case FSNETCMD_SKYCOLOR:              //  49
 				case FSNETCMD_GNDCOLOR:              //  50
 				case FSNETCMD_RESERVED_FOR_LIGHTCOLOR:              //  51
-				case FSNETCMD_RESERVED21:              //  52
+				case FSNETCMD_RESERVED21:
+					StartEndurance(clientId,cmdTop,packetLength);              //  52
+					break;
 				case FSNETCMD_RESERVED22:             //  53
+					StartVIPMission(clientId,cmdTop,packetLength);              //  53
 				case FSNETCMD_RESERVED23:             //  54
 				case FSNETCMD_RESERVED24:             //  55
 				case FSNETCMD_RESERVED25:             //  56
@@ -1385,6 +1389,88 @@ YSRESULT FsSocketServer::BroadcastAirplaneState(void)
 			}
 		}
 		broadcastCounter=(broadcastCounter+1)%n;
+	}
+
+	return YSOK;
+}
+
+YSRESULT FsSocketServer::StartEndurance(int clientId,unsigned char dat[],unsigned packetLength){
+	this->commandQueue.push(FSNCC_SVR_STARTENDURANCEMODE_JET);
+	this->enduranceModeRemainingTime=5.0;
+	
+	return YSOK;
+}
+YSRESULT FsSocketServer::StartVIPMission(int clientId,unsigned char dat[],unsigned packetLength){
+			YsVec3 pos;
+			YsAtt3 att;
+			float x,y,z,h,p,b;
+			char *vip, *escort, *route;
+			FSIFF iff;
+			const unsigned char *ptr = dat;
+
+			FsPopInt(ptr); //Skip the packet type.
+			iff=(FSIFF)FsPopInt(ptr);
+			x=FsPopFloat(ptr);
+			y=FsPopFloat(ptr);
+			z=FsPopFloat(ptr);
+			h=FsPopFloat(ptr);
+			p=FsPopFloat(ptr);
+			b=FsPopFloat(ptr);
+
+			pos.Set(x,y,z);
+			att.Set(h,p,b);
+
+			vip=(char *)ptr;
+			ptr+=32;
+			escort=(char *)ptr;
+			ptr+=32;
+			route=(char *)ptr;
+			ptr+=32;
+
+			
+			sim->GenerateAIAirplane(YsVec3(41061,1,-18615),YsAtt3(),"AIRBUS320","EUROFIGHTER_TYPHOON","MOLOKAI-KONA-VIP",FS_IFF1);
+	
+	return YSOK;
+}
+
+YSRESULT FsSocketServer:: SendVIPMission(int clientId){
+	unsigned char dat[256], *ptr;
+	char *vip, *escort, *route;
+	YsVec3 pos;
+	YsAtt3 att;
+	FSIFF iff;
+	vip="AIRBUS320";
+	escort="EUROFIGHTER_TYPHOON";
+	route="MOLOKAI-KONA-VIP";
+
+
+	pos.Set(41061,1,-18615);
+	att.Set(0,0,0);
+	att.SetH(YsDegToRad(50));
+	iff=FS_IFF1;
+	ptr = dat;
+	FsPushInt(ptr, FSNETCMD_RESERVED22);
+
+	FsPushInt(ptr, iff);
+	FsPushFloat(ptr, (float)pos.x());
+	FsPushFloat(ptr, (float)pos.y());
+	FsPushFloat(ptr, (float)pos.z());
+	FsPushFloat(ptr, (float)att.h());
+	FsPushFloat(ptr, (float)att.p());
+	FsPushFloat(ptr, (float)att.b());
+
+	strncpy((char *)ptr, vip, 31);
+	ptr[31]=0;
+	ptr+=32;
+	strncpy((char *)ptr, escort, 31);
+	ptr[31]=0;
+	ptr+=32;
+	strncpy((char *)ptr, route, 31);
+	ptr[31]=0;
+	ptr+=32;
+	if (SendPacket(clientId, ptr-dat, dat) != YSOK)
+	{
+		return YSERR;
 	}
 
 	return YSOK;
@@ -1957,6 +2043,7 @@ YSRESULT FsSocketServer::BroadcastEnvironment(void)
 		if(user[i].state!=FSUSERSTATE_NOTCONNECTED)
 		{
 			SendEnvironment(i);
+			SendVIPMission(i);
 		}
 	}
 	return YSOK;
@@ -10730,4 +10817,3 @@ FsServerRunLoop::~FsServerRunLoop()
 	delete opt;
 	delete svrDlg;
 }
-

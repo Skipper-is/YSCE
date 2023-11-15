@@ -2831,7 +2831,7 @@ void FsSimulation::GenerateEnemyAirplane(
 	airSeek=NULL;
 	while((airSeek=FindNextAirplane(airSeek))!=NULL)
 	{
-		if(airSeek->Prop().IsActive()==YSTRUE && airSeek->iff!=FS_IFF3)
+		if(airSeek->Prop().IsActive()==YSTRUE && airSeek->iff!=FS_IFF0)
 		{
 			refPos=airSeek->GetPosition();
 			airExist=YSTRUE;
@@ -2874,7 +2874,7 @@ void FsSimulation::GenerateEnemyAirplane(
 		airSeek=NULL;
 		while((airSeek=FindNextAirplane(airSeek))!=NULL)
 		{
-			if(airSeek->Prop().IsActive()==YSTRUE && airSeek->iff==FS_IFF3)
+			if(airSeek->Prop().IsActive()==YSTRUE && airSeek->iff==FS_IFF1)
 			{
 				nCurrentEnemy++;
 			}
@@ -2886,11 +2886,11 @@ void FsSimulation::GenerateEnemyAirplane(
 
 		minutePassed=15-int(timeRemain/60.0);
 		nEnemyShouldBe=YsBound((minutePassed-2)/3,0,5);
-
+		nEnemyShouldBe = 10;
 
 		if(nCurrentEnemy==0 || nEnemyMax<nEnemyShouldBe) // Need to generate new one
 		{
-			if(nEnemyMax<5)
+			if(nEnemyMax<10)
 			{
 				nEnemyMax++;
 			}
@@ -2957,7 +2957,7 @@ void FsSimulation::GenerateEnemyAirplane(
 					df->minAlt=1000.0;
 					neo->SetAutopilot(df);
 
-					neo->iff=FS_IFF3;
+					neo->iff=FS_IFF0;
 
 					if(prevAir==NULL)
 					{
@@ -3376,6 +3376,88 @@ void FsSimulation::GenerateFriendlyAirplane(FsInterceptMissionInfo &info)
 			}
 		}
 	}
+}
+
+void FsSimulation::GenerateAIAirplane(YsVec3 pos, YsAtt3 atti,
+	const char vipAircraft[], const char escorts[],YsString airRoute, FSIFF iff)
+	{
+	FsAirplane *vip;
+	vip = world->AddAirplane((char*)vipAircraft, YSFALSE);
+	if (vip == NULL)
+	{
+		return;
+	}
+	vip->SendCommand("INITFUEL 30%");
+	vip->airFlag=FSAIRFLAG_INDEPENDENT;
+	YsVec3 vel;
+
+	vel.Set(0.0,.0,0.0);
+	vip->Prop().SetVelocity(vel);
+	vip->Prop().SetPosition(pos);
+	vip->Prop().SetAttitude(atti);
+	vip->iff=iff;
+	vip->name.Set(YsString("VIP"));
+	vip->Prop().SetDamageTolerance(1000);
+	FsAirRouteAutopilot *ap;
+	ap = FsAirRouteAutopilot::Create();
+	ap->SetAirRouteTag(airRoute);
+	vip->SetAutopilot(ap);
+	if(netServer!=NULL){
+		netServer->BroadcastAddAirplane(vip, FSNET_REMOTE);
+	}
+
+	for(int i = 0; i < 3; i++){
+		double radial;
+		radial=double(rand()%360)*YsPi/180.0;
+		YsVec3 diff,neoPos;
+
+		diff.Set(sin(radial),0.0,cos(radial));
+		diff=diff*8000.0;
+
+		neoPos=pos+diff;
+		neoPos.SetY(4000.0);
+
+		FsAirplane *neo2 = world->AddAirplane((char*)escorts, YSFALSE);
+
+		neo2->chaseOffset.Set(diff);
+		//Max out weapons
+		const int nAim9=neo2->Prop().GetMaxNumWeapon(FSWEAPON_AIM9);
+		const int nAim9x=neo2->Prop().GetMaxNumWeapon(FSWEAPON_AIM9X);
+		const int nAim120=neo2->Prop().GetMaxNumWeapon(FSWEAPON_AIM120);
+
+		YsString reloadCommand[5];
+		reloadCommand[0]="UNLOADWP";
+		reloadCommand[1]="LOADWEPN IFLR 20";
+		reloadCommand[4].Printf("LOADWEPN AIM120 %d",nAim120);
+		reloadCommand[3].Printf("LOADWEPN AIM9 %d",nAim9);
+		reloadCommand[2].Printf("LOADWEPN AIM9X %d",nAim9x);
+		for(auto &cmd : reloadCommand)
+		{
+			neo2->SendCommand(cmd);
+		}
+
+		neo2->airFlag=FSAIRFLAG_INDEPENDENT;
+
+		YsVec3 vel=-diff;
+		vel.Normalize();
+		vel*=120.0;
+		neo2->Prop().SetVelocity(vel);
+		neo2->Prop().SetPosition(neoPos);
+		neo2->iff=iff;
+		neo2->Prop().SetDamageTolerance(neo2->Prop().GetDamageTolerance()*2);
+		neo2->name.Set(YsString("Escort"));
+
+		FsDogfight *df;
+		df=FsDogfight::Create();
+		df->gLimit=20.0; //Because UV wants our pilots to have an aneurysm
+		df->minAlt=333.0;
+		neo2->SetAutopilot(df);
+		if (netServer != NULL) {
+			netServer->BroadcastAddAirplane(neo2, FSNET_REMOTE);
+		}
+		RadioCommSendCoverMe(neo2, vip);
+	}
+
 }
 
 void FsSimulation::GenerateTank

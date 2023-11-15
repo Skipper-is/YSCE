@@ -385,6 +385,12 @@ public:
 
 	YSRESULT RectifyIllegalMissiles(void);
 
+	YSRESULT StartEndurance(int clientId,unsigned char dat[],unsigned packetLength);
+	YSRESULT StartVIPMission(int clientId, unsigned char dat[], unsigned packetLength);
+
+	
+
+
 	YSBOOL ReceivedKillServer(void);
 
 	int GetNumMessage(void) const;
@@ -461,6 +467,7 @@ public:
 	YSRESULT SendSmokeColor(int clientId,int idOnSvr,int smkIdx,const YsColor &col);
 	YSRESULT SendReportScore(int clientId,YSBOOL scored,FsNetworkScoreLog &score);
 	YSRESULT SendForceJoin(int clientId);
+	YSRESULT SendVIPMission(int clientId);
 
 	YSRESULT FlushSendQueue(int clientId,unsigned timeout);
 	YSRESULT FlushAllSendQueue(unsigned timeout);

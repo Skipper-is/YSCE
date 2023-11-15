@@ -296,6 +296,10 @@ YSRESULT FsDogfight::SearchTarget(FsAirplane &air,FsSimulation *sim)
 				trg=can;
 				min=(tpos-pos).GetSquareLength();
 			}
+			if ((tpos-pos).GetSquareLength()>YsSqr(farThreshold*5)){
+				trg=NULL;
+
+			}
 		}
 	}
 
@@ -334,7 +338,7 @@ YSBOOL FsDogfight::CanBeTarget(const FsAirplane *air,const FsAirplane *trg) cons
 	{
 		return YSFALSE;
 	}
-	if(trg->Prop().IsActive()!=YSTRUE || trg->iff==air->iff)
+	if(trg->Prop().IsActive()!=YSTRUE || trg->iff==air->iff || trg->iff == FS_IFF0)
 	{
 		return YSFALSE;
 	}
@@ -431,6 +435,7 @@ YSRESULT FsDogfight::MakeDecision(FsAirplane &air,FsSimulation *sim,const double
 	//check if the current target is attacking the aircraft that the AI is defending
 	FsAirplane *target=GetTarget(sim);
 	FsAirplane *defendThis=sim->FindAirplane(defendThisAirplaneKey);
+	
 	if(defendThis!=NULL && target!=NULL)
 	{
 		YSBOOL targetOk=YSFALSE;
@@ -1098,8 +1103,8 @@ YSRESULT FsDogfight::ApplyControl(FsAirplane &air,FsSimulation *sim,const double
 				{
 					flareClockStep -= randomStep;
 				}
-				printf("missile dist: %lf\n", missileDist);
-				printf("flare clock step: %lf\n", flareClockStep);
+				// printf("missile dist: %lf\n", missileDist);
+				// printf("flare clock step: %lf\n", flareClockStep);
 
 				//dispense flare and reset flare timer based on missile distance to AI aircraft
 				switch (chasingWeaponType) // Adapted from Pasutisu's code.
@@ -1140,8 +1145,23 @@ YSRESULT FsDogfight::ApplyControl(FsAirplane &air,FsSimulation *sim,const double
 		//current mode: no target - idle in circle
 		case DFMODE_NOTARGET/*-1*/:
 			{
+				FsAirplane *defendThis = sim->FindAirplane(defendThisAirplaneKey);
+				if (defendThis!=NULL){
+					YsVec3 tVel, tRVel, tPos;
+					defendThis->Prop().GetVelocity(tVel);
+					air.Prop().GetInverseMatrix().Mul(tRVel, tVel,0.0);
+					double tG;
+					tG = defendThis->Prop().GetG();
+					tPos = defendThis->GetPosition();
+					
+					tPos.SetY(tPos.y()+3000);
+					ShallowPursuit(air, sim, tPos, defendThis->GetAttitude(), tVel, tG, dt, gLimit, -3.0, YSFALSE);
+					// FollowTarget(air, sim, tPos, defendThis->GetAttitude(), tVel, tG, dt, gLimit,-3.0, YSFALSE);
+				}
+				else{
 				CircleAround(air,sim,3000.0);
 				minAlt=3000.0;
+				}
 			}
 			break;
 		//current mode: target far in front of AI airctaft - go straight (1G, no bank)

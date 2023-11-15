@@ -609,6 +609,7 @@ public:
 	    int nEnemy,const class FsMissionEnemyGroundAttackerInfo &info,const double &iniDistFixedWing,const double &iniDistRotorWing,
 	    YSBOOL reducedAttackDist,const double initialSpeed);
 	void GenerateFriendlyAirplane(FsInterceptMissionInfo &info);
+	void GenerateAIAirplane(YsVec3 pos,YsAtt3 atti, const char vipAircraft[], const char escorts[], YsString airRoute, FSIFF iff);
 	void GenerateTank
 	   (int nTank,FsCloseAirSupportMissionInfo &info,
 	    YSBOOL mobile,YSBOOL incremental,YSBOOL primaryTarget,

@@ -1072,7 +1072,6 @@ void FsAutopilot::ShallowPursuit
 	YsVec3 relVel,relTargPos;
 	YsAtt3 flatAtt;
 	double speed;
-
 	flatAtt=air.GetAttitude();
 	flatAtt.SetP(0.0);
 	flatAtt.SetB(0.0);
@@ -1080,6 +1079,9 @@ void FsAutopilot::ShallowPursuit
 	air.Prop().GetVelocity(relVel);
 	relVel-=targetVelocity;
 	flatAtt.MulInverse(relTargPos,targetPos-air.Prop().GetPosition());
+	if (air.chaseOffset){
+		relTargPos=relTargPos+air.chaseOffset;
+	}
 	if(relTargPos.z()<0.0)
 	{
 		flyingAway=YSTRUE;
@@ -1714,7 +1716,7 @@ YSBOOL FsAutopilot::NeedImmediateRecoveryFromLowAltitude(FsAirplane &air,const d
 	// It takes a second or so to recover from inverted position.  Take it into account.  Multiply 50% safety factor.
 	const double tRecoverBank=1.5*fabs(air.GetAttitude().b()/air.Prop().GetMaxRollRate());
 	const double altLossRecoverBank=vv*tRecoverBank;
-	printf("tBankRecovery=%lf\n",tRecoverBank);
+	// printf("tBankRecovery=%lf\n",tRecoverBank);
 
 
 	double descendingAngle,angularVelocity,t,r;
@@ -2452,7 +2454,7 @@ YSRESULT FsTaxiingAutopilot::MakeDecision(FsAirplane &air,FsSimulation *sim,cons
 		if(tst.GetSquareLength()<turnRadius*turnRadius)
 		{
 			this->taxiPathIdx++;
-			printf("taxiPathIdx++ %d %d\n",(int)this->taxiPathIdx,(int)this->taxiPath.GetN());
+			// printf("taxiPathIdx++ %d %d\n",(int)this->taxiPathIdx,(int)this->taxiPath.GetN());
 
 			if(MODE_TAKEOFF==mode && taxiPathIdx==taxiPath.GetN()-1)
 			{
@@ -3402,7 +3404,7 @@ YSRESULT FsLandingAutopilot::GetApproachPath
 		ils->Prop().GetAircraftCarrierProperty()->GetILS().GetLandingPositionAndAttitude(tdPos,rwAtt);
 		rwAtt.SetP(0.0);
 
-		printf("TDP: %s\n",tdPos.Txt());
+		// printf("TDP: %s\n",tdPos.Txt());
 
 		ilsTfm.Translate(tdPos);
 		ilsTfm.Rotate(rwAtt);
@@ -3578,8 +3580,8 @@ void FsLandingAutopilot::CalculateTrafficPattern(const FsAirplane &air,const YsV
 	rwAtt.SetP(0.0);
 
 	trafficPatternAltitude=tdPos.y()+trafficPatternAltitudeAGL;
-	printf("TDP: %s\n",tdPos.Txt());
-	printf("TPA: %.2lfm MSL (%.2lfm AGL)\n",trafficPatternAltitude,trafficPatternAltitudeAGL);
+	// printf("TDP: %s\n",tdPos.Txt());
+	// printf("TPA: %.2lfm MSL (%.2lfm AGL)\n",trafficPatternAltitude,trafficPatternAltitudeAGL);
 
 	// Lateral offset : for landing of a flock of small airplanes.
 	YsVec3 latOffset;
@@ -3644,15 +3646,15 @@ YSBOOL FsLandingAutopilot::CanMakeStraightIn(const FsAirplane &air)
 	y0=air.GetPosition().y();
 	yGS=p0.z()*tan(glideSlope);
 
-	printf("GS: %lf\n",YsRadToDeg(glideSlope));
-	printf("v0: %lf  y0: %lf  yGS: %lf  z0: %lf\n",v,y0,yGS,p0.z());
+	// printf("GS: %lf\n",YsRadToDeg(glideSlope));
+	// printf("v0: %lf  y0: %lf  yGS: %lf  z0: %lf\n",v,y0,yGS,p0.z());
 
 	if(p0.z()<=landingSpeed*30.0 || fabs(p0.x())>=p0.z()*tan(YsPi/6.0))  // Within +-15 degree envelope.
 	{
 		return YSFALSE;
 	}
 
-	printf("In envelope\n");
+	// printf("In envelope\n");
 
 	if(y0>=yGS)
 	{
@@ -4098,8 +4100,8 @@ YSRESULT FsLandingAutopilot::MakeDecision(FsAirplane &air,FsSimulation *sim,cons
 {
 if(&air==sim->GetPlayerObject())
 {
-printf("Phase %d\n",landingPhase);
-printf("Elv %lf  Trim %lf\n",air.Prop().GetElevator(),air.Prop().GetElvTrim());
+// printf("Phase %d\n",landingPhase);
+// printf("Elv %lf  Trim %lf\n",air.Prop().GetElevator(),air.Prop().GetElvTrim());
 }
 	const YsVec3 &airPos=air.GetPosition();
 	const YsAtt3 &airAtt=air.GetAttitude();
@@ -7155,6 +7157,7 @@ YSBOOL FsAirRouteAutopilot::Accomplished(void)
 
 YSRESULT FsAirRouteAutopilot::FetchAirRoute(const FsSimulation *sim,const char tag[])
 {
+	printf("Fetch Air Route %s\n",tag);
 	if(NULL==sceneryCache || NULL==(airRouteCache=sceneryCache->FindAirRouteByTag(tag)))
 	{
 		state=STATE_ERROR;
