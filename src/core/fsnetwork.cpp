@@ -1427,8 +1427,14 @@ YSRESULT FsSocketServer::StartVIPMission(int clientId,unsigned char dat[],unsign
 			route=(char *)ptr;
 			ptr+=32;
 
+			int usersOnline=0;
+			for(int i=0;i<FS_MAX_NUM_USER;i++){
+				if(user[i].state==FSUSERSTATE_LOGGEDON){
+					usersOnline++;
+				}
+			}
 			
-			sim->GenerateAIAirplane(YsVec3(41061,1,-18615),YsAtt3(),"AIRBUS320","EUROFIGHTER_TYPHOON","MOLOKAI-KONA-VIP",FS_IFF1);
+			sim->GenerateAIAirplane(YsVec3(41061,1,-18615),YsAtt3(),"AIRBUS320","EUROFIGHTER_TYPHOON","MOLOKAI-KONA-VIP",FS_IFF1, usersOnline);
 	
 	return YSOK;
 }

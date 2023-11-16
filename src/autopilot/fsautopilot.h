@@ -909,6 +909,7 @@ public:
 private:
 	AIRROUTE_STATE state;
 	double sameStateTimer;
+	AutoFlareDispenser flareDispenser;
 
 	int airRouteIdx;
 	YsVec3 legStart;
