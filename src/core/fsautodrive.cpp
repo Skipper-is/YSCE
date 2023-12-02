@@ -721,7 +721,7 @@ void FsAutoDriveToExactPosition::Control(class FsSimulation *sim,class FsGround 
 			if(YSTRUE==CheckUnreachable(sim,gnd,goal2d))
 			{
 				totalUnreachableTurn+=turnFromPrevious;
-				printf("Unreachable!! %lf deg\n",YsRadToDeg(totalUnreachableTurn));
+				// printf("Unreachable!! %lf deg\n",YsRadToDeg(totalUnreachableTurn));
 				if(YsPi<totalUnreachableTurn)
 				{
 					alignControl.Start(gnd,finalSpeed,goalPos,goalHdg);

@@ -1984,7 +1984,7 @@ void FsHud2::DrawRWRHUD(const FsSimulation* sim, const FsAirplane* withRespectTo
 
 			//determine RWR identifier based on aircraft category
 			std::string idString = "";
-			printf("%s\n", currAir->GetIdentifier());
+			// printf("%s\n", currAir->GetIdentifier());
 			switch (currAir->Prop().GetAirplaneCategory())
 			{
 				case FSAC_UNKNOWN:

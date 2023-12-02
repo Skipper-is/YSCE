@@ -88,7 +88,7 @@ enum
 	FSNETCMD_SKYCOLOR,               //  49 Svr -> Cli
 	FSNETCMD_GNDCOLOR,               //  50 Svr -> Cli
 	FSNETCMD_RESERVED_FOR_LIGHTCOLOR,//  51 Svr -> Cli
-	FSNETCMD_RESERVED21,             //  52
+	FSNETCMD_GENERATEATTACKER,             //  52
 	FSNETCMD_RESERVED22,             //  53
 	FSNETCMD_RESERVED23,             //  54
 	FSNETCMD_RESERVED24,             //  55
@@ -304,6 +304,8 @@ public:
 	class FsInterceptMissionInfo *imInfo;
 
 	double enduranceModeRemainingTime,gLimit;
+	FSIFF targetIFF, interceptorIFF;
+	YsString targetAircraft, interceptorAircraft;
 	int nEnduranceModeEnemyMax;
 	YSBOOL enduranceModeJet,enduranceModeWw2;
 

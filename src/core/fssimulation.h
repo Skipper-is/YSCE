@@ -605,6 +605,8 @@ public:
 
 	void GenerateEnemyAirplane(
 	    int &nEnemy,double &gLimit,const double &timeRemain,YSBOOL allowAAM,YSBOOL jet,YSBOOL ww2);
+	void GenerateEnemyAirplane(
+	    int &nEnemy, YsVec3 pos, const char interceptorAircraft[],FSIFF targetIFF, FSIFF attackerIFF);
 	void GenerateAttackerAirplane(
 	    int nEnemy,const class FsMissionEnemyGroundAttackerInfo &info,const double &iniDistFixedWing,const double &iniDistRotorWing,
 	    YSBOOL reducedAttackDist,const double initialSpeed);

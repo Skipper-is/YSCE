@@ -909,7 +909,7 @@ YSRESULT FsSocketServer::ReceivedFrom(int clientId,YSSIZE_T nBytes,unsigned char
 				case FSNETCMD_SKYCOLOR:              //  49
 				case FSNETCMD_GNDCOLOR:              //  50
 				case FSNETCMD_RESERVED_FOR_LIGHTCOLOR:              //  51
-				case FSNETCMD_RESERVED21:
+				case FSNETCMD_GENERATEATTACKER:
 					StartEndurance(clientId,cmdTop,packetLength);              //  52
 					break;
 				case FSNETCMD_RESERVED22:             //  53
@@ -1395,8 +1395,27 @@ YSRESULT FsSocketServer::BroadcastAirplaneState(void)
 }
 
 YSRESULT FsSocketServer::StartEndurance(int clientId,unsigned char dat[],unsigned packetLength){
-	this->commandQueue.push(FSNCC_SVR_STARTENDURANCEMODE_JET);
-	this->enduranceModeRemainingTime=5.0;
+	targetIFF;
+	interceptorIFF;
+	interceptorAircraft;
+	YsVec3 pos;
+	int count;
+	// Server will send: packetType (52), targetIFF, interceptorIFF,  interceptorAircraft (32 chars), pos x, y and z.
+	//Spawn 'count' number of interceptor aircraft near the position, and target anyone on that IFF.
+
+	const unsigned char *ptr = dat;
+
+	FsPopInt(ptr); //Skip the packet type. # 4 bytes
+	targetIFF=(FSIFF)FsPopInt(ptr); //8
+	interceptorIFF=(FSIFF)FsPopInt(ptr); //12
+	interceptorAircraft=(char *)ptr; //44
+	ptr+=32;
+	pos.Set(FsPopFloat(ptr),FsPopFloat(ptr),FsPopFloat(ptr)); //56
+	count=FsPopInt(ptr); //60
+
+
+
+	sim->GenerateEnemyAirplane(count,pos,interceptorAircraft,targetIFF,interceptorIFF);
 	
 	return YSOK;
 }
@@ -5250,7 +5269,7 @@ YSRESULT FsSocketClient::Received(YSSIZE_T nBytes,unsigned char dat[])
 					ReceiveGroundColor(cmdTop);
 					break;
 				case FSNETCMD_RESERVED_FOR_LIGHTCOLOR:             //  51
-				case FSNETCMD_RESERVED21:             //  52
+				case FSNETCMD_GENERATEATTACKER:             //  52
 				case FSNETCMD_RESERVED22:             //  53
 				case FSNETCMD_RESERVED23:             //  54
 				case FSNETCMD_RESERVED24:             //  55
