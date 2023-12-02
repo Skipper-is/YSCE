@@ -82,4 +82,9 @@ jobs:
         name: ys-build-linux
         path: ./ci_ubuntu/main/
         retention-days: 14
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ys-build-linux-server
+        path: ./ci_ubuntu/main_consvr/
+        retention-days: 1
 # MacOS was here, but Nodoka kicked it off a short pier.
