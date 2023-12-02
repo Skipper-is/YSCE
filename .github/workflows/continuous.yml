@@ -25,7 +25,7 @@ jobs:
       run: vcpkg install --triplet x64-windows
       working-directory: src
     - name: checkout_public
-      run: git clone https://github.com/YSCEDC/ysce_public.git
+      run: git clone https://github.com/Skipper-is/ysce_public.git
     - name: mkdir
       run: mkdir ci_windows
     - name: cmake
@@ -39,12 +39,17 @@ jobs:
       with:
         name: ys-build-windows
         path: ./ci_windows/main/Release
-        retention-days: 14
+        retention-days: 1
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ys-build-windows-nownd
+        path: ./ci_windows/main_consvr
+        retention-days: 1
         
 
   build-linux:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v3
@@ -58,7 +63,7 @@ jobs:
       run: vcpkg install --triplet x64-linux
       working-directory: src
     - name: checkout_public
-      run: git clone https://github.com/YSCEDC/ysce_public.git
+      run: git clone https://github.com/Skipper-is/ysce_public.git
     - name: mkdir
       run: mkdir ci_ubuntu
     - name: apt-get-update
@@ -81,10 +86,11 @@ jobs:
       with:
         name: ys-build-linux
         path: ./ci_ubuntu/main/
-        retention-days: 14
+        retention-days: 1
     - uses: actions/upload-artifact@v3
       with:
-        name: ys-build-linux-server
-        path: ./ci_ubuntu/main_consvr/
+        name: ys-build-linux-nownd
+        path: ./ci_ubuntu/main_consvr
         retention-days: 1
+      
 # MacOS was here, but Nodoka kicked it off a short pier.
