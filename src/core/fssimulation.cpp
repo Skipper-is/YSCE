@@ -3039,7 +3039,7 @@ void FsSimulation::GenerateEnemyAirplane(
 				diff.Set(sin(radial),0.0,cos(radial));
 				diff=diff*8000.0;
 				neoPos=pos+diff;
-				neoPos.SetY(4000.0);
+				neoPos.SetY(1000.0);
 
 
 				FsAirplane *neo;
@@ -3074,7 +3074,7 @@ void FsSimulation::GenerateEnemyAirplane(
 						df=FsDogfight::Create();
 						df->farThreshold = 20000; //20km search radius
 						df->gLimit=8;
-						df->minAlt=1000.0;
+						df->minAlt=300.0;
 						neo->SetAutopilot(df);
 
 						neo->iff=attackerIFF;
